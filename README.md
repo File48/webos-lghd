@@ -72,17 +72,19 @@ To skip it for a single boot: `ssh root@TV_IP 'touch /media/developer/lghd/disab
 
 ## Litefin
 
-Litefin 2.0.20 needs two small client-side fixes to direct-play Dolby Vision MKVs on webOS 24:
+Litefin 2.0.20 needs three small client-side fixes on webOS 24:
 
 1. **Rule removal.** Its "Dolby Vision MKV — Force Remux on WebOS < 25" rule makes Jellyfin reject direct play. You get HLS, and TrueHD is transcoded. Upstream master has already removed this rule.
 2. **DV hint.** Its Dolby Vision hint is the bare `video/mp4; codecs="dvh1"`, and webOS 24's `canPlayType` rejects that. The patch builds the hint from the stream's profile and level, e.g. `dvh1.08.10`.
+
+3. **Non-default audio tracks.** When you pick a DTS/TrueHD track that isn't the file's default, Litefin asks Jellyfin to remux (and so transcode) instead of direct playing, because it assumes webOS can't switch to those tracks. On webOS 24 it can: the patch keeps direct play and switches the track on the TV.
 
 Litefin is MPL-2.0. This repo ships only the edits, which `litefin/make-patch.py` applies to your own copy of the app, checking md5s before and after:
 
 ```sh
 A=/media/developer/apps/usr/palm/applications/org.litefin.app/js
-scp root@TV_IP:$A/main-5d7218db.js root@TV_IP:$A/main-37bbcbe8.js .
-python3 litefin/make-patch.py main-5d7218db.js main-37bbcbe8.js litefin/out
+for f in main-5d7218db.js main-37bbcbe8.js main-5166335e.js; do scp root@TV_IP:$A/$f .; done
+python3 litefin/make-patch.py main-5d7218db.js main-37bbcbe8.js main-5166335e.js litefin/out
 sh install.sh root@TV_IP        # copies litefin/out/* and mounts them
 ```
 

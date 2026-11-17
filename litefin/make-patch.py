@@ -6,7 +6,8 @@ Litefin is MPL-2.0; this repo ships only the edits, never Litefin's files.
   # copy the originals off the TV
   scp root@TV:/media/developer/apps/usr/palm/applications/org.litefin.app/js/main-5d7218db.js .
   scp root@TV:/media/developer/apps/usr/palm/applications/org.litefin.app/js/main-37bbcbe8.js .
-  python3 litefin/make-patch.py main-5d7218db.js main-37bbcbe8.js out/
+  scp root@TV:/media/developer/apps/usr/palm/applications/org.litefin.app/js/main-5166335e.js .
+  python3 litefin/make-patch.py main-5d7218db.js main-37bbcbe8.js main-5166335e.js out/
 
 Patch 1 (main-5d7218db.js): disable the "Dolby Vision MKV - Force Remux on WebOS < 25"
   CodecProfile, which makes Jellyfin refuse direct play of DV MKVs
@@ -14,6 +15,10 @@ Patch 1 (main-5d7218db.js): disable the "Dolby Vision MKV - Force Remux on WebOS
 Patch 2 (main-37bbcbe8.js): build the DV canPlayType hint from the stream's
   DvProfile/DvLevel (dvh1.08.10 ...) instead of bare "dvh1", which webOS 24 rejects.
   Logs each candidate as "lghd-patch: canPlayType(...)".
+Patch 3 (main-5166335e.js): on the webOS backend, don't force a server remux when a
+  non-default DTS/TrueHD/FLAC track is chosen. Litefin assumes webOS can't switch to
+  those tracks natively; on webOS 24 the native audioTracks list includes them, so the
+  file stays on direct play and the track is switched on the TV.
 """
 import hashlib, os, sys
 
@@ -24,6 +29,10 @@ PATCHES = {
         orig="5e97eccfcf0ba768d21fcd20c1e8e7c4", out="352d968667fe96551c6635ce11948c6a",
         old='V&&d.webosVersion<25&&Y.push({Type:"Video",Container:"mkv"',
         new='V&&d.webosVersion<0&&Y.push({Type:"Video",Container:"mkv"'),
+    "main-5166335e.js": dict(
+        orig="779591a64037215995d162b32acaca3f", out="b15b1a889188754c9742b9d5bcc7418d",
+        old='"movi"===i||"exoplayer"===i)return!1;const a=e.MediaStreams',
+        new='"movi"===i||"exoplayer"===i||"webos"===i)return!1;const a=e.MediaStreams'),
     "main-37bbcbe8.js": dict(
         orig="24b7ac5527c0f03f65ce36ede7f4f63b", out="b75b606d3fbb0e2f7948680b7227b8f8",
         old="const t='video/mp4; codecs=\"dvh1\"'",
@@ -37,11 +46,11 @@ PATCHES = {
 }
 
 def main():
-    if len(sys.argv) != 4:
+    if len(sys.argv) < 3:
         sys.exit(__doc__)
-    outdir = sys.argv[3]
+    outdir = sys.argv[-1]
     os.makedirs(outdir, exist_ok=True)
-    for path in sys.argv[1:3]:
+    for path in sys.argv[1:-1]:
         name = os.path.basename(path)
         p = PATCHES.get(name) or sys.exit(f"{name}: not a file this patch knows")
         src = open(path, "rb").read()

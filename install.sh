@@ -15,7 +15,7 @@ ssh "$HOST" "mkdir -p $D/plugins $D/litefin"
 scp "$SO" "$HOST:$D/plugins/.tmp"
 scp tv/lghd.sh tv/boot.sh tv/probe.sh litefin/litefin-patch.sh "$HOST:$D/"
 scp tv/lghd.conf "$HOST:$D/lghd.conf.default"
-for f in litefin/out/main-5d7218db.js litefin/out/main-37bbcbe8.js; do
+for f in litefin/out/main-*.js; do
   [ -f "$f" ] && scp "$f" "$HOST:$D/litefin/"
 done
 

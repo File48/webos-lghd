@@ -10,7 +10,8 @@ APP=/media/developer/apps/usr/palm/applications/org.litefin.app
 PDIR=/media/developer/lghd/litefin
 # name  installed-md5 (2.0.20)  patched-md5
 FILES="main-5d7218db.js:5e97eccfcf0ba768d21fcd20c1e8e7c4:352d968667fe96551c6635ce11948c6a
-main-37bbcbe8.js:24b7ac5527c0f03f65ce36ede7f4f63b:b75b606d3fbb0e2f7948680b7227b8f8"
+main-37bbcbe8.js:24b7ac5527c0f03f65ce36ede7f4f63b:b75b606d3fbb0e2f7948680b7227b8f8
+main-5166335e.js:779591a64037215995d162b32acaca3f:b15b1a889188754c9742b9d5bcc7418d"
 
 md5() { md5sum < "$1" | cut -c1-32; }
 mounted() { grep -q " $(readlink -f "$1") " /proc/mounts; }
