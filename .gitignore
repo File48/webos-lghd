@@ -1,0 +1,8 @@
+sysroot/
+ffmpeg-src/
+ffout/
+*.so
+litefin/out/
+main-*.js
+*.log
+__pycache__/
