@@ -36,8 +36,10 @@ On Ubuntu 24.04 you can build without Docker. Install `gcc-arm-linux-gnueabi lib
 
 ## Install
 
+Use the prebuilt `libgstlghdaudio.so` from [Releases](https://github.com/File48/webos-lghd/releases) (tested on LG C2 / webOS 24 only), or build it yourself as above.
+
 ```sh
-sh install.sh root@TV_IP
+sh install.sh root@TV_IP path/to/libgstlghdaudio.so
 ```
 
 Then fully close and relaunch your player app.
