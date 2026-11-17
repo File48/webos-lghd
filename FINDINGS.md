@@ -23,7 +23,7 @@ app (Chromium/WAM) → uMediaServer → starfish-media-pipeline (one process per
 avconnector reports the **source** codec to audiooutputd, e.g. `"true-hd"` with 8 channels, or `"(null)"` for codecs it can't name. Inside audiooutputd, libumi only selects multichannel PCM when **all** of these hold:
 
 - the input codec is exactly `"pcm"`;
-- the digital sound output mode isn't `pcm` (Pass Through is what works);
+- the digital sound output mode isn't `pcm` (Auto and Pass Through both work; Auto is recommended because Pass Through sends Dolby Digital Plus Atmos from apps as stereo PCM);
 - the channel count is 2, 6 or 8, and the sink device supports it (from `setExternalArcSettings` / the eARC capability);
 - `activeState` is true. This is a global flag that defaults to true.
 

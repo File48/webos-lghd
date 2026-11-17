@@ -55,7 +55,7 @@ ssh root@TV_IP 'sh /media/developer/lghd/lghd.sh status; tail -5 /tmp/lghd_boot.
 
 You should see `send pcm/6 (initial)`, followed by `outputtype=2,1,6,0,0` (eARC set to multichannel PCM 5.1). For a Dolby Vision MKV you should also see `dvtag: first AU: rpu=1 ... -> DOLBY VISION`.
 
-**TV setting:** *Sound → Advanced → Digital Sound Output* must be **Pass Through**. On one boot, `audiooutputd` came up in `pcm` mode even though the setting said Pass Through. The boot log warns if this happens; toggling the setting to Auto and back to Pass Through fixes it.
+**TV setting:** *Sound → Advanced → Digital Sound Output* should be **Auto**. Auto and Pass Through both give multichannel PCM from the decoder, but only Auto lets Dolby Digital Plus Atmos from apps reach the receiver as Atmos; in Pass Through the TV sends those tracks as stereo PCM. The boot log warns if `audiooutputd` ever disagrees with the setting (seen once, stuck in `pcm`); toggling the setting fixes it.
 
 ### Settings
 

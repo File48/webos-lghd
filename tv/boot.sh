@@ -40,7 +40,7 @@ main() {
   want=$(luna-send -n 1 luna://com.webos.service.settings/getSystemSettings '{"category":"sound","keys":["soundOutputDigital"]}' 2>/dev/null | grep -o '"soundOutputDigital":"[^"]*"' | cut -d'"' -f4)
   have=$(timeout 5 luna-send -n 1 luna://com.webos.service.audiooutput/quality/getSettings '{"category":"soundOutputMode"}' 2>/dev/null | grep -o '"mode":"[^"]*"' | cut -d'"' -f4)
   if [ -n "$want" ] && [ "$want" != "$have" ]; then
-    echo "WARNING: TV setting soundOutputDigital=$want but audiooutputd mode=$have (multichannel PCM needs passThrough). Toggle Digital Sound Output to fix."
+    echo "WARNING: TV setting soundOutputDigital=$want but audiooutputd mode=$have. Toggle Digital Sound Output to fix."
   else
     echo "digital output mode OK: setting=$want audiooutputd=$have"
   fi
