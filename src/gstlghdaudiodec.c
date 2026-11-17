@@ -58,7 +58,7 @@ GST_DEBUG_CATEGORY_STATIC (lghd_debug);
 #define OUT_CH 8
 #define EARC_CTL_NAME  "Sndout EARC Outputtype"
 #define EARC_ONOFF     "Sndout EARC OnOff"
-#define LGHD_VERSION   "2.3"
+#define LGHD_VERSION   "2.4"
 #define LOG_PATH       "/tmp/lghd.log"
 #define GSTLOG_PATH    "/tmp/lghd_gst.log"
 #define CONF_PATH      "/media/developer/lghd/lghd.conf"
@@ -113,7 +113,8 @@ G_DEFINE_TYPE (GstLgHdAudioDec, gst_lghd_audio_dec, GST_TYPE_AUDIO_DECODER);
 
 static GstStaticPadTemplate sink_tmpl = GST_STATIC_PAD_TEMPLATE ("sink",
     GST_PAD_SINK, GST_PAD_ALWAYS,
-    GST_STATIC_CAPS ("audio/x-true-hd; audio/x-dts"));
+    GST_STATIC_CAPS ("audio/x-true-hd; audio/x-dts; "
+        "audio/x-unknown, codec-id=(string){ A_DTS, A_TRUEHD }"));
 
 static GstStaticPadTemplate src_tmpl = GST_STATIC_PAD_TEMPLATE ("src",
     GST_PAD_SRC, GST_PAD_ALWAYS,
@@ -680,12 +681,17 @@ static gboolean
 gst_lghd_set_format (GstAudioDecoder * dec, GstCaps * caps)
 {
   GstLgHdAudioDec *self = GST_LGHD_AUDIO_DEC (dec);
-  const gchar *name = gst_structure_get_name (gst_caps_get_structure (caps, 0));
+  const GstStructure *st = gst_caps_get_structure (caps, 0);
+  const gchar *name = gst_structure_get_name (st);
+  const gchar *cid = gst_structure_get_string (st, "codec-id");
   enum AVCodecID id;
 
-  if (g_str_equal (name, "audio/x-true-hd"))
+  /* LG's matroskademux emits DTS as audio/x-unknown, codec-id=A_DTS */
+  if (g_str_equal (name, "audio/x-true-hd") ||
+      (g_str_equal (name, "audio/x-unknown") && cid && g_str_equal (cid, "A_TRUEHD")))
     id = AV_CODEC_ID_TRUEHD;
-  else if (g_str_equal (name, "audio/x-dts"))
+  else if (g_str_equal (name, "audio/x-dts") ||
+      (g_str_equal (name, "audio/x-unknown") && cid && g_str_equal (cid, "A_DTS")))
     id = AV_CODEC_ID_DTS;
   else
     return FALSE;

@@ -7,7 +7,7 @@ It was built for one setup: Jellyfin → [Litefin](https://github.com/MoazSalem/
 | | Stock | With lghd |
 |---|---|---|
 | TrueHD in MKV (direct play) | not supported → server transcodes to EAC3 | decoded on the TV → 5.1 multichannel PCM over eARC |
-| DTS / DTS-HD MA | depends on model/firmware | decoded on the TV → 5.1 multichannel PCM (implemented; less tested than TrueHD) |
+| DTS / DTS-HD MA in MKV | no sound (LG's demuxer labels it `audio/x-unknown`, nothing decodes it) | decoded on the TV → 5.1 multichannel PCM |
 | Dolby Vision (profile 8) in MKV | HDR10 base layer | Dolby Vision |
 
 > **Scope.** Tested only on an **LG OLED55C24LA (C2), webOS 24 / SDK 9.2.2**, with a Sonos soundbar on eARC and Litefin 2.0.20. Other models and firmware may differ in ways that matter: resource names, ALSA controls, registry paths. It needs root (e.g. via [webosbrew](https://www.webosbrew.org/) / Homebrew Channel). Use at your own risk.

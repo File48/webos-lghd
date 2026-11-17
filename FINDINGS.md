@@ -15,6 +15,8 @@ app (Chromium/WAM) → uMediaServer → starfish-media-pipeline (one process per
 - The pipeline process gets its ID in argv: `-scom.webos.pipeline._XXXX`.
 - The ADEC resource can be read from the sink's `index` property. Reading `resource-info` back returns NULL.
 - The stock registry has no element that handles `audio/x-true-hd`, so apps can't play TrueHD and Jellyfin transcodes it.
+- LG's `matroskademux` outputs DTS (core and DTS-HD MA) as `audio/x-unknown, codec-id=A_DTS`. LG's own `dts_audiodec` (rank secondary) only accepts `audio/x-dts`/`x-dtsh`/`x-dtsl`/..., so nothing links and playback is silent. The plugin accepts the `x-unknown, codec-id=A_DTS` caps directly.
+- Litefin can't switch to a non-default audio track during direct play; it asks Jellyfin to stream instead, which transcodes DTS/TrueHD. Make the wanted track the file's default (`mkvpropedit FILE --edit track:a1 --set flag-default=0 --edit track:a2 --set flag-default=1`).
 
 ## Why the TV picks stereo for decoded audio
 
