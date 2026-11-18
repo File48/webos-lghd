@@ -65,6 +65,7 @@ LG's DSP swaps centre and LFE compared with WAV order. The plugin outputs 8 slot
 - **Registry location.** The registry is `/mnt/flash/data/gst_1_0_registry.arm.bin`, which resolves to `/mnt/lg/flash/data/...`, and that resolved path is what `/proc/mounts` shows. Bind-mounting a RAM copy works and is undone by a reboot.
 - **Logging.** PmLogDaemon only passes messages on its whitelist (`/etc/PmLogDaemon/whitelist.txt`), so libumi INFO logs never appear in the system log. The plugin logs to its own file.
 - **Startup hook.** Homebrew Channel's `/var/lib/webosbrew/init.d` runs scripts with run-parts, so filenames must not contain dots.
+- **Digital Sound Output resets at boot.** `soundOutputDigital` is stored per input: the settings service takes a `dimension` of `{"audioInput":"media"}` for apps and `hdmi1`–`hdmi4` for the HDMI inputs, not `hdmi`. Its description says `"volatile": false`, but every boot brings it back as `passThrough` on all inputs, and no service logs writing it. A runtime `setSystemSettings` survives input switching, so the boot hook sets `auto` on all five inputs.
 
 ## Dolby Vision in MKV
 

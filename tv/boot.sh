@@ -4,9 +4,11 @@
 #   - builds the RAM registry and bind-mounts it (lghd.sh build/install; nothing written to flash)
 #   - stops idle starfish-media-pipeline processes that started before the install
 #     (they read LG's registry once at start and would skip TrueHD/DTS)
+#   - sets Digital Sound Output to Auto (LG resets it to Pass Through at every boot)
 #   - logs whether audiooutputd's digital output mode matches the TV setting
 #   - bind-mounts the patched Litefin bundle (litefin-patch.sh) if the installed app matches
 # Skip it for a boot:   touch /media/developer/lghd/disabled
+# Keep LG's Digital Sound Output setting:   touch /media/developer/lghd/no-sound-auto
 # Remove it entirely:   rm -f /var/lib/webosbrew/init.d/60-lghd
 DIR=/media/developer/lghd
 LOG=/tmp/lghd_boot.log
@@ -15,6 +17,15 @@ LOG=/tmp/lghd_boot.log
 
 main() {
   echo "$(date +%T) boot hook start, uptime $(cut -d' ' -f1 /proc/uptime)s"
+  # LG resets Digital Sound Output to Pass Through at every boot (C2 / webOS 24), and Pass Through
+  # sends Dolby Digital Plus Atmos from apps as stereo PCM. Auto keeps it and still gives multichannel
+  # PCM from the decoder. The setting is per input, so set it for apps and every HDMI input.
+  if [ ! -e $DIR/no-sound-auto ]; then
+    for d in media hdmi1 hdmi2 hdmi3 hdmi4; do
+      luna-send -n 1 luna://com.webos.settingsservice/setSystemSettings "{\"category\":\"sound\",\"settings\":{\"soundOutputDigital\":\"auto\"},\"dimension\":{\"audioInput\":\"$d\"}}" >/dev/null 2>&1
+    done
+    echo "set Digital Sound Output to auto (media, hdmi1-4)"
+  fi
   # gst-inspect and the registry path need the system up; wait for /mnt/flash/data
   i=0; while [ ! -f /mnt/flash/data/gst_1_0_registry.arm.bin ] && [ $i -lt 60 ]; do sleep 2; i=$((i+1)); done
   [ -f $DIR/litefin-patch.sh ] && sh $DIR/litefin-patch.sh mount
